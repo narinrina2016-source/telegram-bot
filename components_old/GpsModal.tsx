@@ -31,10 +31,10 @@ export default function GpsModal({
 
   useEffect(() => {
     if (isOpen) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setLoading(true);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setErrorMsg(null);
+      setTimeout(() => {
+        setLoading(true);
+        setErrorMsg(null);
+      }, 0);
       if ('geolocation' in navigator) {
         navigator.geolocation.getCurrentPosition(
           (position) => {
@@ -52,17 +52,18 @@ export default function GpsModal({
           { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
         );
       } else {
-        setErrorMsg('Geolocation is not supported by your browser.');
-        setLoading(false);
+        setTimeout(() => {
+          setErrorMsg('Geolocation is not supported by your browser.');
+          setLoading(false);
+        }, 0);
       }
     } else {
        // Reset state on close
-       // eslint-disable-next-line react-hooks/set-state-in-effect
-       setUserLocation(null);
-       // eslint-disable-next-line react-hooks/set-state-in-effect
-       setDistance(null);
-       // eslint-disable-next-line react-hooks/set-state-in-effect
-       setErrorMsg(null);
+       setTimeout(() => {
+         setUserLocation(null);
+         setDistance(null);
+         setErrorMsg(null);
+       }, 0);
     }
   }, [isOpen]);
 

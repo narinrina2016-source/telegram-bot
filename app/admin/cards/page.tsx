@@ -43,9 +43,9 @@ export default function AdminCards() {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchEmployees();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setTimeout(() => {
+      fetchEmployees();
+    }, 0);
   }, []);
 
   const handlePrint = () => {

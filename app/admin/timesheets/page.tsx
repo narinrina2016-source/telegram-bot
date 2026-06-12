@@ -40,10 +40,10 @@ export default function TimesheetsPage() {
 
   useEffect(() => {
     if (selectedEmp) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      fetchTimesheets();
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      fetchSchedule();
+      setTimeout(() => {
+        fetchTimesheets();
+        fetchSchedule();
+      }, 0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedEmp]);

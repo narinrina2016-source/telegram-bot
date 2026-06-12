@@ -72,10 +72,10 @@ export default function GpsModal({
     };
     
     if (isOpen) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setLoading(true);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setErrorMsg(null);
+      setTimeout(() => {
+        setLoading(true);
+        setErrorMsg(null);
+      }, 0);
       
       loadOfficeSettings().then((settings) => {
         if ('geolocation' in navigator) {
@@ -101,12 +101,11 @@ export default function GpsModal({
       });
     } else {
        // Reset state on close
-       // eslint-disable-next-line react-hooks/set-state-in-effect
-       setUserLocation(null);
-       // eslint-disable-next-line react-hooks/set-state-in-effect
-       setDistance(null);
-       // eslint-disable-next-line react-hooks/set-state-in-effect
-       setErrorMsg(null);
+       setTimeout(() => {
+         setUserLocation(null);
+         setDistance(null);
+         setErrorMsg(null);
+       }, 0);
     }
   }, [isOpen]);
 

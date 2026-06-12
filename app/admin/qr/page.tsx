@@ -60,7 +60,6 @@ export default function AdminQr() {
     };
     
     fetchExistingOrGenerate();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleDownload = () => {

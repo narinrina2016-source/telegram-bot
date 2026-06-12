@@ -98,7 +98,6 @@ export default function AdminEmployees() {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchEmployees();
   }, []);
 

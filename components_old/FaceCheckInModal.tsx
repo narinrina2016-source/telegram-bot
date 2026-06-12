@@ -53,10 +53,10 @@ export default function FaceCheckInModal({
     }
 
     if (isOpen) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSuccess(false);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setErrorMsg(null);
+      setTimeout(() => {
+        setSuccess(false);
+        setErrorMsg(null);
+      }, 0);
       loadModels().then(setupCamera);
     }
 
@@ -134,7 +134,6 @@ export default function FaceCheckInModal({
   };
 
   // Simulate an automatic check loop
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     let interval: any;
     if (isOpen && !loadingModels && !loading && !success && !errorMsg) {
@@ -143,6 +142,7 @@ export default function FaceCheckInModal({
        }, 3000); // Check every 3 seconds
     }
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, loadingModels, loading, success, errorMsg]);
 
   if (!isOpen) return null;

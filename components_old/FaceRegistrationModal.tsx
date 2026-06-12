@@ -50,10 +50,10 @@ export default function FaceRegistrationModal({
     }
 
     if (isOpen) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSuccess(false);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setErrorMsg(null);
+      setTimeout(() => {
+        setSuccess(false);
+        setErrorMsg(null);
+      }, 0);
       loadModels().then(setupCamera);
     }
 
