@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Users, QrCode, MessageCircle, Settings, ShieldCheck, LogOut, FileText, DollarSign, Clock, IdCard, MonitorSmartphone, Keyboard } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { getOrgSlug } from '@/lib/org-client';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -170,6 +170,69 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </nav>
 
         <div className="flex-1 overflow-y-auto">
+          {!isSupabaseConfigured && (
+            <div className="m-6 p-6 bg-amber-50 border border-amber-200 rounded-2xl shadow-sm text-slate-800">
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-amber-100 rounded-xl text-amber-800 shrink-0">
+                  <Settings className="w-6 h-6 animate-pulse" />
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-lg font-bold text-amber-900">
+                      ⚠️ Supabase Database is Not Configured / មិនទាន់បានកំណត់រចនាសម្ព័ន្ធ Supabase
+                    </h3>
+                    <p className="text-slate-600 mt-1 max-w-2xl text-sm leading-relaxed">
+                      This application requires environment variables connected to your Supabase project. Currently, actions like adding employees will not write to the database.
+                      <br />
+                      កម្មវិធីនេះត្រូវការគន្លឹះ Supabase ដើម្បីដំណើរការ។ បើគ្មានការកំណត់ទេ មុខងារបន្ថែមបុគ្គលិក ឬរក្សាទុកទិន្នន័យនឹងមិនដំណើរការឡើយ។
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 text-xs font-medium md:text-sm">
+                    <div className="bg-white p-4 rounded-xl border border-amber-200/60 space-y-2">
+                      <h4 className="font-bold text-slate-900 border-b pb-1.5 flex items-center justify-between">
+                        <span>📍 Find keys in Supabase Dashboard</span>
+                        <span className="text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded text-[10px]">Step 1</span>
+                      </h4>
+                      <ol className="list-decimal list-inside space-y-1.5 text-slate-600 leading-normal">
+                        <li>Go to your Supabase Dashboard project page.</li>
+                        <li>Click <strong className="text-slate-900">Project Settings (Gear Icon)</strong> at the bottom left.</li>
+                        <li>Select <strong className="text-slate-900">API</strong> Settings menu.</li>
+                        <li>Copy the <strong className="text-slate-900">Project URL</strong> and matching keys.</li>
+                      </ol>
+                    </div>
+
+                    <div className="bg-white p-4 rounded-xl border border-amber-200/60 space-y-2">
+                      <h4 className="font-bold text-slate-900 border-b pb-1.5 flex items-center justify-between">
+                        <span>🔑 Match Env Variables</span>
+                        <span className="text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded text-[10px]">Step 2</span>
+                      </h4>
+                      <div className="space-y-2 font-mono text-[11px] leading-relaxed">
+                        <div className="p-1.5 bg-slate-50 border rounded text-slate-800">
+                          <strong className="text-amber-800">NEXT_PUBLIC_SUPABASE_URL</strong> = Project URL
+                        </div>
+                        <div className="p-1.5 bg-slate-50 border rounded text-slate-800">
+                          <strong className="text-amber-800">NEXT_PUBLIC_SUPABASE_ANON_KEY</strong> = anon public key
+                        </div>
+                        <div className="p-1.5 bg-slate-50 border rounded text-slate-800">
+                          <strong className="text-amber-800">SUPABASE_SERVICE_ROLE_KEY</strong> = service_role secret key
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-amber-100/50 rounded-xl border border-amber-200 text-xs">
+                    <p className="font-bold text-amber-900 mb-1">💡 For Vercel Hosting / សម្រាប់ Vercel Deployment:</p>
+                    <p className="text-amber-900/80 leading-normal">
+                      Go to your Vercel Dashboard → Project Settings → Environment Variables. Add these keys, then save and run a new Deployment.
+                      <br />
+                      សូមទៅកាន់ Vercel Dashboard → Project Settings → Environment Variables រួចបន្ថែមគន្លឹះទាំងនេះ និងបង្កើតការ deploy ឡើងវិញ!
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           {children}
         </div>
       </main>

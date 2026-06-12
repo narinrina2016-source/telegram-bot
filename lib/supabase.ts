@@ -7,3 +7,8 @@ const supabaseAnonKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'mock-anon
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+export const isSupabaseConfigured = 
+  !!process.env.NEXT_PUBLIC_SUPABASE_URL && 
+  !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('mock') && 
+  !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('your-project');
+

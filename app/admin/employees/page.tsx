@@ -2,13 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { applyOrg, getOrgSlug } from '@/lib/org-client';
-import { Users, Plus, Pencil, Trash2, Search, Loader2, FileUp, Download } from 'lucide-react';
+import { Users, Plus, Pencil, Trash2, Search, Loader2, FileUp, Download, Settings } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
 export default function AdminEmployees() {
   const [employees, setEmployees] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [rlsError, setRlsError] = useState<string | null>(null);
   
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -124,15 +125,22 @@ export default function AdminEmployees() {
     e.preventDefault();
     try {
       if (editingId && editingId !== 'mock1') {
-        await applyOrg(supabase.from('employees')).update(formData).eq('id', editingId);
+        const { error } = await applyOrg(supabase.from('employees')).update(formData).eq('id', editingId);
+        if (error) throw new Error(error.message);
       } else {
-        await supabase.from('employees').insert({ ...formData, org_id: getOrgSlug() });
+        const { error } = await supabase.from('employees').insert({ ...formData, org_id: getOrgSlug() });
+        if (error) throw new Error(error.message);
       }
       setIsModalOpen(false);
       fetchEmployees();
-    } catch (err) {
+      setRlsError(null);
+    } catch (err: any) {
       console.error(err);
-      alert('Error saving employee');
+      if (err.message && (err.message.toLowerCase().includes('row-level security') || err.message.toLowerCase().includes('rls') || err.message.toLowerCase().includes('policy'))) {
+        setRlsError(err.message);
+      } else {
+        alert('Error saving employee: ' + (err.message || 'Unknown error'));
+      }
     }
   };
 
@@ -140,21 +148,25 @@ export default function AdminEmployees() {
     if (!confirm('Are you sure you want to delete this employee?')) return;
     try {
       if (id !== 'mock1') {
-         await applyOrg(supabase.from('employees')).delete().eq('id', id);
+         const { error } = await applyOrg(supabase.from('employees')).delete().eq('id', id);
+         if (error) throw new Error(error.message);
       }
       fetchEmployees();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      alert('Error deleting employee: ' + (err.message || 'Unknown error'));
     }
   };
 
   const toggleActive = async (id: string, current: boolean) => {
     if (id === 'mock1') return;
     try {
-      await applyOrg(supabase.from('employees')).update({ active: !current }).eq('id', id);
+      const { error } = await applyOrg(supabase.from('employees')).update({ active: !current }).eq('id', id);
+      if (error) throw new Error(error.message);
       fetchEmployees();
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      alert('Error toggling status: ' + (err.message || 'Unknown error'));
     }
   };
 
@@ -193,6 +205,63 @@ export default function AdminEmployees() {
           </button>
         </div>
       </div>
+
+      {rlsError && (
+        <div className="mb-6 p-6 bg-rose-50 border border-rose-200 rounded-2xl shadow-sm text-slate-800">
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-rose-100 rounded-xl text-rose-800 shrink-0">
+              <Settings className="w-6 h-6 animate-pulse" />
+            </div>
+            <div className="space-y-4 w-full">
+              <div>
+                <h3 className="text-lg font-bold text-rose-900">
+                  🔒 Row-Level Security (RLS) Policy Error Detected / រកឃើញបញ្ហាសេរីភាពសុវត្ថិភាព RLS
+                </h3>
+                <p className="text-slate-600 mt-1 text-sm leading-relaxed">
+                  Your Supabase <strong>employees</strong> table has Row-Level Security enabled, which prevents our application from inserting new employee records.
+                  <br />
+                  តារាង Supabase <strong>employees</strong> របស់លោកអ្នកត្រូវបានបើក RLS ហេតុនេះហើយមិនអាចឱ្យប្រព័ន្ធបញ្ចូលបុគ្គលិកថ្មីបានទេ។
+                </p>
+              </div>
+
+              <div className="bg-slate-900 text-slate-100 p-4 rounded-xl font-mono text-xs overflow-x-auto border border-slate-800 relative group">
+                <div className="absolute right-3 top-3">
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(`ALTER TABLE employees DISABLE ROW LEVEL SECURITY;
+ALTER TABLE attendance DISABLE ROW LEVEL SECURITY;
+ALTER TABLE timesheets DISABLE ROW LEVEL SECURITY;
+ALTER TABLE weekly_schedules DISABLE ROW LEVEL SECURITY;
+ALTER TABLE payroll_adjustments DISABLE ROW LEVEL SECURITY;
+ALTER TABLE organizations DISABLE ROW LEVEL SECURITY;
+ALTER TABLE face_enrollments DISABLE ROW LEVEL SECURITY;
+ALTER TABLE qr_codes DISABLE ROW LEVEL SECURITY;`);
+                      alert('SQL copied to clipboard!');
+                    }}
+                    className="p-1 px-2.5 bg-slate-800 hover:bg-slate-700 text-[10px] rounded text-emerald-400 font-bold tracking-wider transition-colors cursor-pointer"
+                  >
+                    COPY SQL
+                  </button>
+                </div>
+                <pre>{`-- Run this in your Supabase SQL Editor to fix / ដំណើរការកូដនេះក្នុង SQL Editor របស់ Supabase:
+ALTER TABLE employees DISABLE ROW LEVEL SECURITY;
+ALTER TABLE attendance DISABLE ROW LEVEL SECURITY;
+ALTER TABLE timesheets DISABLE ROW LEVEL SECURITY;
+ALTER TABLE weekly_schedules DISABLE ROW LEVEL SECURITY;
+ALTER TABLE payroll_adjustments DISABLE ROW LEVEL SECURITY;
+ALTER TABLE organizations DISABLE ROW LEVEL SECURITY;
+ALTER TABLE face_enrollments DISABLE ROW LEVEL SECURITY;
+ALTER TABLE qr_codes DISABLE ROW LEVEL SECURITY;`}</pre>
+              </div>
+
+              <div className="text-xs text-rose-800 flex flex-col gap-1 list-none leading-relaxed">
+                <li><strong>📍 How to run this:</strong> Web Dashboard of Supabase &gt; Project &gt; SQL Editor (left sidebar) &gt; New Query &gt; Paste SQL and click <strong>Run</strong>!</li>
+                <li><strong>📍 របៀបកំណត់៖</strong> ចូលទៅកាន់ Supabase Web Dashboard &gt; ជ្រើសរើស Project &gt; យក SQL Editor (ម៉ឺនុយចំហៀងខាងឆ្វេង) &gt; បង្កើត New Query &gt; ផាសកូដខាងលើ រួចចុច <strong>Run</strong></li>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden text-sm md:text-base">
         
