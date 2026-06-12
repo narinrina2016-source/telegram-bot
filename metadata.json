@@ -1,6 +1,6 @@
 {
   "name": "SecureAttend",
-  "description": "Multi-tenant employee attendance and HR/payroll system with geofence, face match, QR, and NFC check-in.",
+  "description": "Employee attendance tracker with geofence, face match, and QR code check in.",
   "requestFramePermissions": [
     "camera",
     "geolocation"

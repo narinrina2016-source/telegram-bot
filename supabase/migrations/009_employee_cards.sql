@@ -1,0 +1,2 @@
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS nfc_serial TEXT;
+ALTER TABLE employees ADD COLUMN IF NOT EXISTS photo_url TEXT;

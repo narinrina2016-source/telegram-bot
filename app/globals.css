@@ -2,6 +2,23 @@
 @import "tw-animate-css";
 
 @theme {
-  --font-sans: var(--font-kantumruy-pro), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-kantumruy-pro), "Kantumruy Pro", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-kantumruy-pro), "Kantumruy Pro", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --color-primary: #4f46e5;
+  --color-brand-indigo: #4f46e5;
+  --color-brand-violet: #7c3aed;
+  --shadow-brand: 0 4px 14px 0 rgba(79, 70, 229, 0.39);
+  --shadow-premium: 0 10px 25px -5px rgba(124, 58, 237, 0.2), 0 8px 10px -6px rgba(124, 58, 237, 0.1);
+  --background-image-gradient-brand: linear-gradient(135deg, var(--color-brand-indigo) 0%, var(--color-brand-violet) 100%);
+}
+
+@layer base {
+  html, body {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Khmer script optimization */
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+  }
 }
