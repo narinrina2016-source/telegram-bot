@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { fetchOrgSettings, saveOrgSettings } from '@/lib/org-settings';
-import { MapPin, Save, Loader2, RefreshCw } from 'lucide-react';
+import { MapPin, Save, Loader2, RefreshCw, Database, Copy, Check } from 'lucide-react';
 
 export default function AdminSystem() {
   const [gpsLink, setGpsLink] = useState('');
@@ -14,6 +14,28 @@ export default function AdminSystem() {
   const [loading, setLoading] = useState(false);
   const [parsing, setParsing] = useState(false);
   const [message, setMessage] = useState('');
+  
+  const [schemaCopied, setSchemaCopied] = useState(false);
+  const [copyingSchema, setCopyingSchema] = useState(false);
+
+  const handleCopySchema = async () => {
+    setCopyingSchema(true);
+    try {
+      const res = await fetch('/api/database/schema');
+      const data = await res.json();
+      if (data.success && data.sql) {
+        await navigator.clipboard.writeText(data.sql);
+        setSchemaCopied(true);
+        setTimeout(() => setSchemaCopied(false), 3000);
+      } else {
+        alert('Failed to load SQL Schema from server.');
+      }
+    } catch (e) {
+      alert('Error copying schema file.');
+    } finally {
+      setCopyingSchema(false);
+    }
+  };
 
   const loadSettings = async () => {
     setLoading(true);
@@ -224,6 +246,57 @@ export default function AdminSystem() {
               onChange={(e) => setWorkEndTime(e.target.value)}
               className="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-600 outline-none transition-all"
             />
+          </div>
+        </div>
+      </div>
+
+      {/* Database Schema Setup Instruction Card */}
+      <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200 mt-6">
+        <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
+           <div className="p-2 bg-indigo-100 text-indigo-600 rounded-lg">
+             <Database className="w-6 h-6" />
+           </div>
+           <h2 className="text-xl font-bold text-slate-800">Supabase Database Setup</h2>
+        </div>
+        
+        <div className="space-y-4">
+          <p className="text-slate-600 text-sm leading-relaxed">
+            If you see 404 errors in the console, your database tables are likely missing. 
+            To link this live applet with your custom Supabase instance correctly, you must create 
+            the required database tables.
+          </p>
+          
+          <div className="bg-indigo-50/60 rounded-2xl p-5 border border-indigo-100 space-y-3">
+            <h3 className="font-semibold text-indigo-900 text-sm">Step-by-step Setup instructions:</h3>
+            <ol className="list-decimal list-inside text-indigo-950 text-xs space-y-2 leading-relaxed">
+              <li>Open your <strong>Supabase Dashboard</strong> of your project.</li>
+              <li>Click on the <strong>SQL Editor</strong> icon in the left-hand menu.</li>
+              <li>Click <strong>New Query</strong> to create an empty SQL query sheet.</li>
+              <li>Click the <strong>Copy SQL Schema</strong> button below.</li>
+              <li>Paste the code into the editor and click <strong>Run</strong> at the bottom-right.</li>
+            </ol>
+          </div>
+
+          <div className="flex items-center justify-between pt-2">
+            <span className="text-xs text-slate-500 font-medium">Schema code source: /supabase/schema.sql</span>
+            <button
+              onClick={handleCopySchema}
+              disabled={copyingSchema}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-sm transition-all shadow-sm ${
+                schemaCopied 
+                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white' 
+                  : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+              }`}
+            >
+              {copyingSchema ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : schemaCopied ? (
+                <Check className="w-4 h-4" />
+              ) : (
+                <Copy className="w-4 h-4" />
+              )}
+              {schemaCopied ? 'Schema Copied!' : 'Copy SQL Schema'}
+            </button>
           </div>
         </div>
       </div>
